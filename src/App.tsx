@@ -84,7 +84,7 @@ export function App() {
     </Dialog>}
     {modal === 'privacy' && <Dialog title="IA e privacidade" onClose={() => setModal(undefined)}>
       <h3>Como utilizamos a IA</h3>
-      <p>O Next Level utiliza automação para apoiar tarefas administrativas e facilitar a comunicação. Este protótipo utiliza respostas simuladas e não toma decisões de seleção. As decisões de recrutamento permanecem sob responsabilidade humana.</p>
+      <p>O Next Level utiliza automação para apoiar tarefas administrativas e facilitar a comunicação. O Concierge utiliza respostas simuladas. Os testes das missões controlam o acesso ao agendamento nesta demonstração. A decisão de contratação é da equipa.</p>
       <h3>Privacidade do protótipo</h3>
       <p>Esta demonstração utiliza dados fictícios guardados localmente no navegador. Não existe ligação a um sistema real de recrutamento.</p>
       <p>O LocalStorage pode manter estes dados mesmo depois de fechares a página. Usa «Reiniciar demonstração» para apagar o progresso e o conteúdo guardado e repor os dados fictícios iniciais.</p>

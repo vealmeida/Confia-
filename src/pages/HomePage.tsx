@@ -1,8 +1,9 @@
 import { ArrowRight, CalendarDays, HeartHandshake, MessageCircle, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { CompanyIntroduction } from '../components/CompanyIntroduction'
 import { useApp } from '../context/AppContext'
 
 const features = [
-  { icon: Sparkles, color: 'lilac', title: 'Jornada gamificada', description: 'Descobre a empresa, explora a função e prepara a conversa com missões opcionais.' },
+  { icon: Sparkles, color: 'lilac', title: 'Jornada gamificada', description: 'Descobre a empresa, explora a função e prepara a conversa com missões e testes de conhecimentos.' },
   { icon: MessageCircle, color: 'mint', title: 'Candidate Concierge', description: 'Esclarece dúvidas sobre a candidatura e pede ajuda à equipa quando precisares.' },
   { icon: CalendarDays, color: 'lilac', title: 'Agendamento inteligente', description: 'Escolhe, altera ou cancela o horário da entrevista em poucos cliques.' },
   { icon: HeartHandshake, color: 'mint', title: 'Momentos Humanos', description: 'A equipa de recrutamento acompanha os pedidos que beneficiam de uma conversa.' },
@@ -30,6 +31,7 @@ export function HomePage() {
         </div>
       </div>
     </section>
+    <CompanyIntroduction />
     <section className="features" aria-labelledby="features-title">
       <p className="eyebrow">A experiência Next Level</p>
       <h2 id="features-title">Uma jornada, dois pontos de vista.</h2>

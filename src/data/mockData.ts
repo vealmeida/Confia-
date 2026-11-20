@@ -45,3 +45,14 @@ export function dateLabel(date: string) {
 
 // Minutos ilustrativos por resposta e por operação administrativa, respetivamente.
 export const estimatedMinutes = { answer: 2, booking: 5 }
+
+export const companyIntroduction = 'A Horizonte é uma empresa fictícia de tecnologia e serviços. As equipas colaboram em projetos digitais e procuram melhorar continuamente a forma como trabalham. A área de People Experience apoia a integração, a comunicação interna e o desenvolvimento das pessoas.'
+
+export const recruitmentTeam = [
+  { name: recruiter, initials: 'MS', role: 'Talent Acquisition Specialist', description: 'Acompanha a candidatura e conduz a entrevista online.' },
+  { name: 'Inês Costa', initials: 'IC', role: 'People Experience Lead', description: 'Representa a equipa da vaga e ajuda a esclarecer dúvidas sobre a função.' },
+]
+
+export function passedAllMissions(passed: readonly MissionId[]) {
+  return missions.every(({ id }) => passed.includes(id))
+}

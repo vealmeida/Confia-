@@ -26,13 +26,16 @@ const answers = [
   { pattern: /\b(alterar|remarcar|reagendar|cancelar|mudar|outro horario)\b.*\b(entrevista|hora|horario|marcacao)\b|\b(remarcar|reagendar|outro horario)\b/, text: 'Abre a área de agendamento para escolher outro horário ou cancelar a entrevista. O painel da Marta é atualizado de imediato.', schedule: true },
   { pattern: /\b(agendar|agendamento|marcar|horarios|disponibilidade|marcacao)\b/, text: 'Podes consultar os horários fictícios e confirmar a tua escolha na área de agendamento.', schedule: true },
   { pattern: /\b(fase|estado|situacao|progresso|ponto de situacao|como esta)\b/, text: 'A tua candidatura foi recebida.' , status: true },
-  { pattern: /\b(etapas|fases|processo de recrutamento|proximos passos)\b/, text: 'A jornada começa com a receção da candidatura. Seguem-se a descoberta da Horizonte, a entrevista com a Marta e o feedback da equipa.' },
+  { pattern: /\b(etapas|fases|processo de recrutamento|proximos passos)\b/, text: 'A jornada começa com a receção da candidatura. Seguem-se a descoberta da Horizonte, os testes das missões, a entrevista com a Marta e o feedback da equipa.' },
   { pattern: /\b(funcao|responsabilidades|vaga|tarefas|cargo)\b/, text: 'A função de People Experience Specialist envolve melhorar a integração, recolher feedback das equipas e facilitar iniciativas de experiência das pessoas.' },
   { pattern: /\b(cultura|valores|horizonte|organizacao)\b/, text: `Os valores da Horizonte são ${values.join(', ')}. A empresa atua no setor de tecnologia e serviços.` },
-  { pattern: /\b(entrevista|preparar|preparacao|dicas|conversa)\b/, text: 'A entrevista é online, dura 30 minutos e será conduzida pela Marta Silva. Terás espaço para partilhar exemplos do teu percurso, conhecer a função e colocar as tuas perguntas.', schedule: true },
+  { pattern: /\b(entrevista|preparar|preparacao|dicas|conversa)\b/, text: 'A entrevista é online, dura 30 minutos e será conduzida pela Marta Silva. Terás espaço para partilhar exemplos do teu percurso, conhecer a função e colocar as tuas perguntas.', schedule: true, introduction: true },
 ]
 
-export function respond(message: string, bookedDate?: string) {
+export function respond(message: string, bookedDate?: string, eligible = false) {
+  const nextStep = eligible
+    ? 'Podes escolher um horário para conversar com a Marta.'
+    : 'Passa nos testes das três missões para desbloquear o agendamento.'
   const input = normalize(message)
   if (humanIntent.test(input)) return { kind: 'human' as const, text: humanReply }
   if (unavailable.test(input)) return { kind: 'unknown' as const, text: unknownReply }
@@ -41,7 +44,11 @@ export function respond(message: string, bookedDate?: string) {
   const text = answer.status
     ? bookedDate
       ? `A tua entrevista está agendada para ${bookedDate}.`
-      : 'A tua candidatura foi recebida. O próximo passo é escolher um horário para conversar com a Marta.'
-    : answer.text
+      : `A tua candidatura foi recebida. ${nextStep}`
+    : answer.schedule && !eligible && !bookedDate
+      ? answer.introduction
+        ? `${answer.text} ${nextStep}`
+        : nextStep
+      : answer.text
   return { kind: 'answer' as const, text, schedule: answer.schedule }
 }

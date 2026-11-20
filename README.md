@@ -59,7 +59,7 @@ O workflow instala o lockfile, verifica TypeScript, executa os testes, obtém o 
 - O Concierge usa regras locais. Uma pergunta sem resposta oferece encaminhamento, que só é registado mediante confirmação. Pedidos explícitos são registados de imediato e pedidos ativos idênticos são deduplicados.
 - A entrevista, os horários e a notificação de convite são fictícios. O último estado da entrevista aparece no painel e as operações anteriores ficam no registo de atividade.
 - Os indicadores são simulados. Contam respostas conhecidas e operações de agendamento (confirmação, alteração e cancelamento). A estimativa de tempo usa **2 minutos por resposta e 5 por operação**, valores configuráveis em `estimatedMinutes` em `src/data/mockData.ts`.
-- Os pontos e as conquistas são simbólicos. Apenas a missão de cultura marca a etapa correspondente na jornada. Marcar uma entrevista atualiza a respetiva etapa e o feedback fica por realizar no cenário demonstrado. A Marta gere manualmente os estados dos Momentos Humanos. As decisões de recrutamento são humanas.
+- Cada missão tem um teste de três perguntas sobre o respetivo conteúdo. São precisas duas respostas certas em cada teste para desbloquear o agendamento. Podes repetir os testes e pedir contacto humano em qualquer altura. Os pontos e as conquistas assinalam o progresso dos testes. Apenas a missão de cultura marca a etapa correspondente na jornada. Marcar uma entrevista atualiza a respetiva etapa e o feedback fica por realizar no cenário demonstrado. A Marta gere manualmente os estados dos Momentos Humanos. As decisões de recrutamento são humanas.
 - O armazenamento pertence ao navegador e à origem do site. Mantém-se até que os dados sejam limpos ou que a demonstração seja reiniciada. Usa apenas texto fictício. O protótipo funciona sem serviços de IA, backend, autenticação, calendários externos ou envio de mensagens. Os perfis são vistas da mesma demo, sem separação de permissões equivalente à de um sistema real. O estado destina-se a uma sessão ativa do protótipo.
 
 ## Guião de apresentação ao júri · dois minutos
@@ -67,7 +67,9 @@ O workflow instala o lockfile, verifica TypeScript, executa os testes, obtém o 
 | Tempo | O que mostrar |
 | --- | --- |
 | **0:00–0:25 · O problema** | Começa na página inicial. Explica como emails, perguntas repetidas e agendamento ocupam tempo que a equipa podia dedicar a conversas com os candidatos. |
-| **0:25–0:55 · A experiência da candidata** | Entra como candidata. Abre «Exploradora da Cultura», lê um valor e conclui a missão. Mostra os 50 pontos, a conquista e o progresso. Explica que a participação é opcional. |
-| **0:55–1:20 · A automação** | Abre o Concierge e escolhe «Como funciona a entrevista?». Usa «Agendar entrevista», escolhe 24 de novembro às 10h00 e confirma. |
+| **0:25–0:55 · A experiência da candidata** | Entra como candidata. Apresenta a Horizonte e a equipa de recrutamento. Abre «Exploradora da Cultura» e mostra o teste e o mínimo de duas respostas certas. |
+| **0:55–1:20 · A automação** | Com os três testes já concluídos na sessão de demonstração, abre o Concierge e escolhe «Como funciona a entrevista?». Usa «Agendar entrevista», escolhe 24 de novembro às 10h00 e confirma. |
 | **1:20–1:50 · O diferencial** | Volta ao Concierge e escreve «Gostava de falar com a Marta para esclarecer algumas dúvidas.» Muda para recrutador, mostra a entrevista e os indicadores. Abre o pedido e marca-o como «Em acompanhamento» e depois «Concluído». |
 | **1:50–2:00 · A mensagem final** | «Next Level: automatizamos tarefas para humanizar relações.» |
+
+Para cumprir os dois minutos, prepara uma sessão com os testes concluídos antes da apresentação e usa uma segunda sessão sem progresso para mostrar o questionário. Os resultados das missões da versão anterior requerem validação pelos novos testes. As entrevistas já marcadas continuam disponíveis para consulta, alteração e cancelamento.

@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { App } from './App'
 import { AppProvider, initialState, reducer, storageKey } from './context/AppContext'
+import { missions } from './data/mockData'
+import type { MissionId } from './data/mockData'
+import { missionQuizzes } from './data/missionQuizzes'
 import { humanReply, respond, unknownReply } from './services/conciergeEngine'
 
 function start() {
@@ -10,6 +13,19 @@ function start() {
 }
 
 const button = (name: string | RegExp) => screen.getByRole('button', { name })
+
+async function fillQuiz(user: ReturnType<typeof userEvent.setup>, mission: MissionId, answers: number[]) {
+  for (const [index, question] of missionQuizzes[mission].entries()) {
+    await user.click(within(screen.getByRole('dialog')).getByRole('radio', { name: question.options[answers[index]] }))
+  }
+  await user.click(button('Verificar respostas'))
+}
+
+function seedPassedMissions() {
+  localStorage.setItem(storageKey, JSON.stringify({
+    ...initialState(), passedMissions: missions.map(({ id }) => id),
+  }))
+}
 
 describe('Jornada e estado local', () => {
   it('atribui 50 pontos uma única vez e recupera o progresso ao recarregar', async () => {
@@ -19,12 +35,17 @@ describe('Jornada e estado local', () => {
     const progress = screen.getByRole('progressbar', { name: 'Progresso da jornada' })
     expect(progress).toHaveAttribute('value', '25')
     await user.click(button(/Exploradora da Cultura/))
-    await user.click(button('Concluir missão'))
+    expect(button('Verificar respostas')).toBeDisabled()
+    await fillQuiz(user, 'culture', [0, 1, 2])
+    expect(screen.getByText(/Respostas certas na última tentativa: 1 de 3/)).toBeVisible()
+    expect(screen.getByText(/^0$/)).toBeVisible()
+    expect(progress).toHaveAttribute('value', '25')
+    await fillQuiz(user, 'culture', [1, 0, 0])
     expect(screen.getByText(/^50$/)).toBeVisible()
     expect(screen.getByText('Cultura descoberta')).toBeVisible()
     expect(progress).toHaveAttribute('value', '50')
     await user.click(button(/Exploradora da Cultura/))
-    expect(screen.queryByRole('button', { name: 'Concluir missão' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Verificar respostas' })).toBeNull()
     await user.click(button('Fechar'))
     app.unmount()
     start()
@@ -33,7 +54,8 @@ describe('Jornada e estado local', () => {
     expect(screen.getByRole('progressbar')).toHaveAttribute('value', '50')
   })
 
-  it('mantém as missões opcionais e reinicia todos os dados após confirmação', async () => {
+  it('reinicia todos os dados após confirmação', async () => {
+    seedPassedMissions()
     const user = userEvent.setup()
     start()
     await user.click(button('Entrar como candidato'))
@@ -60,8 +82,8 @@ describe('Concierge e Momentos Humanos', () => {
     ['Quais são as responsabilidades do cargo?', /integração/],
     ['Que valores tem a Horizonte?', /Inclusão/],
     ['Como funciona a entrevista?', /30 minutos/],
-    ['Posso agendar a entrevista?', /horários fictícios/],
-    ['Quero remarcar', /outro horário/],
+    ['Posso agendar a entrevista?', /desbloquear o agendamento/],
+    ['Quero remarcar', /desbloquear o agendamento/],
     ['Como usam os meus dados?', /navegador/],
   ])('reconhece %s', (question, reply) => {
     expect(respond(question)).toMatchObject({ kind: 'answer', text: expect.stringMatching(reply) })
@@ -102,7 +124,7 @@ describe('Concierge e Momentos Humanos', () => {
     await user.click(button('Concierge'))
     await user.click(button('Como funciona a entrevista?'))
     expect(screen.getByText(/a entrevista é online/i)).toBeVisible()
-    expect(button('Agendar entrevista')).toBeVisible()
+    expect(button('Ir para as missões')).toBeVisible()
     await user.click(button('Quero falar com um recrutador.'))
     await user.click(button('Quero falar com um recrutador.'))
     await user.click(button('Mudar para recrutador'))
@@ -131,7 +153,51 @@ describe('Concierge e Momentos Humanos', () => {
 })
 
 describe('Agendamento', () => {
+  it('bloqueia novas entrevistas até passar nos três testes e apresenta o progresso no painel', async () => {
+    const user = userEvent.setup()
+    start()
+    expect(screen.getByRole('heading', { name: 'Conhece a Horizonte' })).toBeVisible()
+    expect(screen.getByText('Inês Costa')).toBeVisible()
+    await user.click(button('Entrar como candidato'))
+    await user.click(button('Agendamento'))
+    expect(screen.getByRole('heading', { name: 'Agendamento bloqueado' })).toBeVisible()
+    expect(screen.queryByRole('radio')).toBeNull()
+    await user.click(button('Ir para as missões'))
+    for (const mission of missions.slice(0, 2)) {
+      await user.click(button(new RegExp(mission.title)))
+      await fillQuiz(user, mission.id, missionQuizzes[mission.id].map(({ correct }) => correct))
+    }
+    await user.click(button('Agendamento'))
+    expect(screen.getByText(/Passaste em 2 de 3 testes/)).toBeVisible()
+    expect(screen.queryByRole('radio')).toBeNull()
+    await user.click(button('Ir para as missões'))
+    await user.click(button(/Prepara a Conversa/))
+    await fillQuiz(user, 'prepare', [1, 0, 1])
+    expect(screen.getByText(/Já podes agendar a entrevista/)).toBeVisible()
+    await user.click(button('Agendar entrevista'))
+    expect(screen.getByRole('radio', { name: /10h00/ })).toBeVisible()
+    await user.click(button('Mudar para recrutador'))
+    expect(screen.getByText(/Triagem inicial da Ana · 3 de 3/)).toBeVisible()
+  })
+
+  it('impede o agendamento mesmo por ação direta enquanto faltarem testes', () => {
+    const state = { ...initialState(), view: 'schedule' as const, passedMissions: ['culture', 'role'] as MissionId[] }
+    expect(reducer(state, { type: 'book', slot: '24-am', id: 'test', at: '2026-11-20T15:00:00Z' })).toBe(state)
+  })
+
+  it('recupera entrevistas antigas sem dar os testes por concluídos', () => {
+    const { passedMissions, ...legacy } = initialState()
+    localStorage.setItem(storageKey, JSON.stringify({
+      ...legacy, view: 'schedule', completed: ['culture', 'role', 'prepare'],
+      interview: { id: 'legacy', slot: '24-am', status: 'Agendada', at: '2026-11-20T15:00:00Z' },
+    }))
+    start()
+    expect(button('Alterar horário')).toBeVisible()
+    expect(JSON.parse(localStorage.getItem(storageKey)!).passedMissions).toEqual(passedMissions)
+  })
+
   it('confirma, altera o mesmo registo e cancela com confirmação, refletindo cada estado no painel', async () => {
+    seedPassedMissions()
     const user = userEvent.setup()
     start()
     await user.click(button('Entrar como candidato'))

@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useReducer, useState } from 'react'
 import type { Dispatch, ReactNode } from 'react'
-import { candidate, missions, slotLabel, slots, vacancy } from '../data/mockData'
+import { candidate, missions, passedAllMissions, slotLabel, slots, vacancy } from '../data/mockData'
 import type { MissionId, SlotId } from '../data/mockData'
+import { gradeMission, requiredCorrectAnswers } from '../data/missionQuizzes'
 import { greeting, humanReply, normalize, respond } from '../services/conciergeEngine'
 
 export type View = 'home' | 'journey' | 'concierge' | 'schedule' | 'recruiter'
@@ -38,7 +39,7 @@ interface Activity {
 
 interface State {
   view: View
-  completed: MissionId[]
+  passedMissions: MissionId[]
   chat: Message[]
   interview: { id: string; slot: SlotId; status: BookingStatus; at: string; previousSlot?: SlotId } | null
   moments: Moment[]
@@ -48,7 +49,7 @@ interface State {
 type Event =
   | { type: 'navigate'; view: View }
   | { type: 'reset' }
-  | { type: 'mission'; mission: MissionId }
+  | { type: 'mission'; mission: MissionId; answers: number[] }
   | { type: 'chat'; text: string }
   | { type: 'resolve'; messageId: string; accept: boolean }
   | { type: 'book'; slot: SlotId }
@@ -59,16 +60,25 @@ type Action = Event & { id: string; at: string }
 export const storageKey = 'confia-plus-v1'
 const views: View[] = ['home', 'journey', 'concierge', 'schedule', 'recruiter']
 export const initialState = (): State => ({
-  view: 'home', completed: [], chat: [{ id: 'greeting', from: 'bot', text: greeting }],
+  view: 'home', passedMissions: [], chat: [{ id: 'greeting', from: 'bot', text: greeting }],
   interview: null, moments: [], activities: [],
 })
 
 function restore() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) ?? 'null') as State | null
-    if (saved && views.includes(saved.view) && Array.isArray(saved.chat) && Array.isArray(saved.completed)
+    if (saved && views.includes(saved.view) && Array.isArray(saved.chat)
       && Array.isArray(saved.moments) && Array.isArray(saved.activities)
-      && (saved.interview === null || slots.some(({ id }) => id === saved.interview?.slot))) return saved
+      && (saved.interview === null || slots.some(({ id }) => id === saved.interview?.slot))) {
+      // Older sessions did not record passed tests. Preserve their interviews and conversation.
+      const { completed: _legacyCompletions, ...snapshot } = saved as State & { completed?: MissionId[] }
+      return {
+        ...snapshot,
+        passedMissions: Array.isArray(saved.passedMissions)
+          ? missions.filter(({ id }) => saved.passedMissions.includes(id)).map(({ id }) => id)
+          : [],
+      }
+    }
   } catch {
     // An unavailable store or invalid demo snapshot starts a fresh session.
   }
@@ -96,14 +106,16 @@ export function reducer(state: State, event: Action): State {
     case 'reset': return initialState()
     case 'mission': {
       const mission = missions.find(({ id }) => id === event.mission)
-      if (state.view !== 'journey' || !mission || state.completed.includes(mission.id)) return state
-      return log({ ...state, completed: [...state.completed, mission.id] }, event, 'mission', `Ana concluiu a missão voluntária «${mission.title}».`)
+      if (state.view !== 'journey' || !mission || state.passedMissions.includes(mission.id)) return state
+      const correct = gradeMission(mission.id, event.answers)
+      if (correct === undefined || correct < requiredCorrectAnswers) return state
+      return log({ ...state, passedMissions: [...state.passedMissions, mission.id] }, event, 'mission', `Ana passou o teste da missão «${mission.title}».`)
     }
     case 'chat': {
       const text = event.text.trim().slice(0, 400)
       if (state.view !== 'concierge' || !text) return state
       const booked = state.interview && state.interview.status !== 'Cancelada' ? slotLabel(state.interview.slot) : undefined
-      const reply = respond(text, booked)
+      const reply = respond(text, booked, passedAllMissions(state.passedMissions))
       const response: Message = { id: event.id, from: 'bot', text: reply.text }
       if (reply.kind === 'answer') response.schedule = reply.schedule
       if (reply.kind === 'unknown') response.unresolved = text
@@ -128,7 +140,7 @@ export function reducer(state: State, event: Action): State {
     case 'book': {
       if (state.view !== 'schedule' || !slots.some(({ id }) => id === event.slot)) return state
       const active = state.interview?.status !== 'Cancelada' ? state.interview : null
-      if (active?.slot === event.slot) return state
+      if ((!active && !passedAllMissions(state.passedMissions)) || active?.slot === event.slot) return state
       return log({
         ...state, interview: {
           id: active?.id ?? event.id, slot: event.slot, at: event.at,

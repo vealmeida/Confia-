@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, CalendarDays, Headphones, Send, ShieldCheck, Sparkles } from 'lucide-react'
 import { PageTitle } from '../components/ui'
 import { useApp } from '../context/AppContext'
+import { passedAllMissions } from '../data/mockData'
 import { suggestions } from '../services/conciergeEngine'
 
 export function ConciergePage() {
   const { state, send } = useApp()
+  const available = passedAllMissions(state.passedMissions) || (state.interview !== null && state.interview.status !== 'Cancelada')
   const [draft, setDraft] = useState('')
   const chat = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -25,7 +27,7 @@ export function ConciergePage() {
           {state.chat.map((message) => <div key={message.id} className={`message ${message.from}`}>
             <span className="message-author">{message.from === 'bot' ? 'Concierge' : 'Ana'}</span>
             <p>{message.text}</p>
-            {message.schedule && <button className="button secondary compact" onClick={() => send({ type: 'navigate', view: 'schedule' })}><CalendarDays size={15} /> Agendar entrevista <ArrowRight size={14} /></button>}
+            {message.schedule && <button className="button secondary compact" onClick={() => send({ type: 'navigate', view: available ? 'schedule' : 'journey' })}><CalendarDays size={15} /> {available ? 'Agendar entrevista' : 'Ir para as missões'} <ArrowRight size={14} /></button>}
             {message.unresolved && (message.decision ? <span className="pill">{message.decision}</span> :
               <div className="actions">
                 <button className="button primary compact" onClick={() => send({ type: 'resolve', messageId: message.id, accept: true })}>Sim, encaminhar</button>

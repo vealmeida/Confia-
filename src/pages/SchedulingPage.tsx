@@ -1,23 +1,33 @@
 import { useState } from 'react'
-import { CalendarDays, CheckCircle2, Clock3, Mail, UserRound, Video } from 'lucide-react'
+import { CalendarDays, CheckCircle2, Clock3, LockKeyhole, Mail, UserRound, Video } from 'lucide-react'
 import { Dialog, PageTitle } from '../components/ui'
 import { useApp } from '../context/AppContext'
-import { candidate, recruiter, slotLabel, slots, vacancy } from '../data/mockData'
+import { candidate, missions, passedAllMissions, recruiter, slotLabel, slots, vacancy } from '../data/mockData'
 import type { SlotId } from '../data/mockData'
 
 export function SchedulingPage() {
   const { state, send } = useApp()
   const active = state.interview && state.interview.status !== 'Cancelada' ? state.interview : null
+  const eligible = passedAllMissions(state.passedMissions)
   const cancelled = state.interview?.status === 'Cancelada'
   const [slot, setSlot] = useState<SlotId>()
   const [editing, setEditing] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
   const [notice, setNotice] = useState('')
   return <>
-    <PageTitle eyebrow="Área do candidato" title="Agendamento de entrevista" description="Escolhe o horário que te dá mais jeito para conversar com a Marta." />
+    <PageTitle eyebrow="Área do candidato" title="Agendamento de entrevista" description={active || eligible ? "Escolhe o horário que te dá mais jeito para conversar com a Marta." : "Passa nos testes das missões para poderes escolher um horário."} />
     <div className="dashboard-grid">
       <section className="panel">
-        {active && !editing ? <div className="booking-result">
+        {!active && !eligible ? <div className="booking-result">
+          <span className="feature-icon lilac"><LockKeyhole size={24} /></span>
+          <h2>Agendamento bloqueado</h2>
+          <p>Passaste em {state.passedMissions.length} de {missions.length} testes. Conclui as missões em falta para desbloquear os horários.</p>
+          {cancelled && <p className="pill warning">Entrevista anterior cancelada</p>}
+          <div className="actions">
+            <button className="button primary" onClick={() => send({ type: 'navigate', view: 'journey' })}>Ir para as missões</button>
+            <button className="button secondary" onClick={() => send({ type: 'navigate', view: 'concierge' })}>Pedir ajuda</button>
+          </div>
+        </div> : active && !editing ? <div className="booking-result">
           <span className="feature-icon mint"><CheckCircle2 size={26} /></span>
           <h2>{active.status === 'Alterada' ? 'Horário alterado com sucesso!' : 'Entrevista agendada com sucesso!'}</h2>
           <p className="booked-date"><CalendarDays size={19} /> {slotLabel(active.slot)}</p>
@@ -63,7 +73,7 @@ export function SchedulingPage() {
       </aside>
     </div>
     {confirmCancel && <Dialog title="Cancelar entrevista?" onClose={() => setConfirmCancel(false)}>
-      <p>A Marta verá o cancelamento no painel. Podes voltar a escolher um horário.</p>
+      <p>A Marta verá o cancelamento no painel. {eligible ? "Podes voltar a escolher um horário." : "Para fazer uma nova marcação, passa nos testes das missões."}</p>
       <div className="actions">
         <button className="button secondary" onClick={() => setConfirmCancel(false)}>Manter entrevista</button>
         <button className="button danger" onClick={() => {

@@ -3,7 +3,7 @@ import { Activity, ArrowRight, CalendarDays, Clock3, HeartHandshake, Inbox, Mess
 import { Dialog, PageTitle } from '../components/ui'
 import { useApp } from '../context/AppContext'
 import type { RequestStatus } from '../context/AppContext'
-import { candidate, dateLabel, estimatedMinutes, slotLabel, vacancy } from '../data/mockData'
+import { candidate, dateLabel, estimatedMinutes, missions, passedAllMissions, slotLabel, vacancy } from '../data/mockData'
 
 const statusClass: Record<RequestStatus, string> = {
   Pendente: 'warning',
@@ -53,7 +53,12 @@ export function RecruiterDashboard() {
           <div className="info-card"><HeartHandshake size={21} /><p>Os Momentos Humanos ajudam a equipa a concentrar a sua atenção em situações que beneficiam de contacto pessoal, sem substituir o julgamento profissional.</p></div>
         </section>
         <section className="panel">
-          <h2>Entrevistas</h2>
+          <div className="split"><div>
+            <h2>Entrevistas</h2>
+            <p>Triagem inicial da Ana · {state.passedMissions.length} de {missions.length} testes concluídos</p>
+          </div><span className={`pill ${passedAllMissions(state.passedMissions) ? 'success' : 'warning'}`}>
+            {passedAllMissions(state.passedMissions) ? 'Concluída' : 'Por concluir'}
+          </span></div>
           {interview ? <div className="moment interview-record">
             <div className="split"><div className="identity"><span className="avatar">AM</span><div><strong>{candidate}</strong><p>{vacancy}</p></div></div><span className={`pill ${interview.status === 'Cancelada' ? 'warning' : 'success'}`}>{interview.status}</span></div>
             <p className="booked-date"><CalendarDays size={18} /> {slotLabel(interview.slot)}</p>
