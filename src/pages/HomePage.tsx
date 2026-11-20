@@ -31,7 +31,7 @@ export function HomePage() {
       </div>
     </section>
     <section className="features" aria-labelledby="features-title">
-      <p className="eyebrow">A experiência Confia+</p>
+      <p className="eyebrow">A experiência Next Level</p>
       <h2 id="features-title">Uma jornada, dois pontos de vista.</h2>
       <div className="feature-grid">
         {features.map(({ icon: Icon, color, title, description }) => <article className="feature-card" key={title}>

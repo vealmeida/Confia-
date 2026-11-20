@@ -1,4 +1,4 @@
-# Confia+
+# Next Level
 
 **Human Recruitment Journey · Automatizamos tarefas para humanizar relações.**
 
@@ -37,7 +37,7 @@ Abre a subpasta indicada pelo Vite. Por omissão, o caminho base é relativo. A 
 
 1. Coloca o conteúdo desta pasta na raiz de um repositório GitHub e faz push para a branch predefinida.
 2. Em **Settings → Pages → Build and deployment**, escolhe **GitHub Actions** como fonte.
-3. Em **Actions**, executa o workflow **Publicar Confia+ no GitHub Pages** na branch predefinida ou faz um novo push.
+3. Em **Actions**, executa o workflow **Publicar Next Level no GitHub Pages** na branch predefinida ou faz um novo push.
 4. Confirma que o job `deploy` terminou com sucesso e abre o URL apresentado em **Settings → Pages**.
 
 O workflow instala o lockfile, verifica TypeScript, executa os testes, obtém o caminho base com `actions/configure-pages` e publica `dist/` através do mecanismo oficial do Pages. Serve repositórios com nomes arbitrários e sites na raiz. O workflow está preparado para execução no repositório de destino.
@@ -70,4 +70,4 @@ O workflow instala o lockfile, verifica TypeScript, executa os testes, obtém o 
 | **0:25–0:55 · A experiência da candidata** | Entra como candidata. Abre «Exploradora da Cultura», lê um valor e conclui a missão. Mostra os 50 pontos, a conquista e o progresso. Explica que a participação é opcional. |
 | **0:55–1:20 · A automação** | Abre o Concierge e escolhe «Como funciona a entrevista?». Usa «Agendar entrevista», escolhe 24 de novembro às 10h00 e confirma. |
 | **1:20–1:50 · O diferencial** | Volta ao Concierge e escreve «Gostava de falar com a Marta para esclarecer algumas dúvidas.» Muda para recrutador, mostra a entrevista e os indicadores. Abre o pedido e marca-o como «Em acompanhamento» e depois «Concluído». |
-| **1:50–2:00 · A mensagem final** | «Confia+: automatizamos tarefas para humanizar relações.» |
+| **1:50–2:00 · A mensagem final** | «Next Level: automatizamos tarefas para humanizar relações.» |

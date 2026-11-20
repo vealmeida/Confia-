@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { Plus, X } from 'lucide-react'
 
 export function Logo() {
-  return <span className="brand"><span className="brand-mark"><Plus size={19} strokeWidth={3} /></span><span>Confia<span className="brand-plus">+</span></span></span>
+  return <span className="brand"><span className="brand-mark"><Plus size={19} strokeWidth={3} /></span><span>Next Level</span></span>
 }
 
 export function Dialog({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {

@@ -43,7 +43,6 @@ svg { flex: none; }
 .logo-button { border-radius: 10px; }
 .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--deep); font-size: 1.65rem; font-weight: 900; letter-spacing: -.065em; }
 .brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--purple); color: white; }
-.brand-plus { color: var(--purple); }
 .tagline { border-left: 1px solid #e4ddee; padding-left: 22px; font-size: .81rem; font-weight: 650; color: #5b5369; }
 .top-actions { margin-left: auto; }
 .reset-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border: 1px solid #dfd7ed; border-radius: 10px; color: var(--deep); font-size: .81rem; font-weight: 700; }

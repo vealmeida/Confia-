@@ -42,7 +42,7 @@ export function App() {
     <a className="skip-link" href="#main">Saltar para o conteúdo</a>
     <header className="site-header">
       <div className="wrap topbar">
-        <button className="logo-button" onClick={() => go('home')} aria-label="Confia+, início"><Logo /></button>
+        <button className="logo-button" onClick={() => go('home')} aria-label="Next Level, início"><Logo /></button>
         {isHome ? <span className="tagline">Human Recruitment Journey</span> :
           <nav className="main-nav" aria-label="Navegação principal">
             <button onClick={() => go('home')} aria-label="Início"><House size={17} /><span>Início</span></button>
@@ -63,7 +63,7 @@ export function App() {
     </main>
     <footer className="site-footer">
       <div className="wrap footer-inner">
-        <p><HeartHandshake size={18} /> <span><strong>Confia+:</strong> automatizamos tarefas para humanizar relações.</span></p>
+        <p><HeartHandshake size={18} /> <span><strong>Next Level:</strong> automatizamos tarefas para humanizar relações.</span></p>
         <div>
           {(!isHome) && <button onClick={() => setModal('reset')}><RotateCcw size={15} /> Reiniciar demonstração</button>}
           <button onClick={() => setModal('privacy')}><ShieldCheck size={16} /> IA e privacidade</button>
@@ -84,7 +84,7 @@ export function App() {
     </Dialog>}
     {modal === 'privacy' && <Dialog title="IA e privacidade" onClose={() => setModal(undefined)}>
       <h3>Como utilizamos a IA</h3>
-      <p>O Confia+ utiliza automação para apoiar tarefas administrativas e facilitar a comunicação. Este protótipo utiliza respostas simuladas e não toma decisões de seleção. As decisões de recrutamento permanecem sob responsabilidade humana.</p>
+      <p>O Next Level utiliza automação para apoiar tarefas administrativas e facilitar a comunicação. Este protótipo utiliza respostas simuladas e não toma decisões de seleção. As decisões de recrutamento permanecem sob responsabilidade humana.</p>
       <h3>Privacidade do protótipo</h3>
       <p>Esta demonstração utiliza dados fictícios guardados localmente no navegador. Não existe ligação a um sistema real de recrutamento.</p>
       <p>O LocalStorage pode manter estes dados mesmo depois de fechares a página. Usa «Reiniciar demonstração» para apagar o progresso e o conteúdo guardado e repor os dados fictícios iniciais.</p>
